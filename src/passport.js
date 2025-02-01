@@ -1,6 +1,6 @@
 import passport from 'passport';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
-import User from './models/User.js';
+import User from '../dao/models/user.model.js';
 
 const opts = {
     jwtFromRequest: ExtractJwt.fromExtractors([ExtractJwt.fromAuthHeaderAsBearerToken(), ExtractJwt.fromCookie('currentUser')]), // Extraer JWT de cabecera o cookie

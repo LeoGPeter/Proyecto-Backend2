@@ -1,21 +1,20 @@
 import express from 'express';
 import passport from 'passport';
+import UserDTO from "../dto/UserDTO.js";
+import { loginController } from '../controllers/sessionsController.js';
+import {checkAuth} from '../middlewares/authMiddleware.js'
+
 
 const router = express.Router();
 
-// Ruta para obtener datos del usuario actual usando JWT
-router.get('/current', passport.authenticate('jwt', { session: false }), (req, res) => {
-    // Si Passport autenticó correctamente, 'req.user' tiene los datos del usuario
-    const { first_name, last_name, email, age, role } = req.user;
+router.post('/login', loginController);
 
-    // Renderizar la vista de "current" con los datos del usuario
-    res.render('current', {
-        first_name,
-        last_name,
-        email,
-        age,
-        role
-    });
+
+router.get("/current", checkAuth, (req, res) => {
+    const userDTO = new UserDTO(req.user);
+    res.json(userDTO);
 });
+
+
 
 export default router;

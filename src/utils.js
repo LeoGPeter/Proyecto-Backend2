@@ -19,25 +19,32 @@ export const comparePassword = async (password, hashedPassword) => {
 };
 
 // Función para generar un JWT
-export const generateToken = (userData) => {
-    // Asegúrate de que process.env.JWT_SECRET esté definido y no sea undefined
-    if (!process.env.JWT_SECRET) {
-        throw new Error("La clave secreta JWT no está definida en .env");
-    }
-
-    return jwt.sign(userData, process.env.JWT_SECRET, { expiresIn: '1h' });
+export const generateToken = (user) => {
+    return jwt.sign(
+        { 
+            id: user._id, 
+            first_name: user.first_name, 
+            last_name: user.last_name, 
+            email: user.email, 
+            age: user.age, 
+            role: user.role 
+        }, 
+        process.env.JWT_SECRET, 
+        { expiresIn: '1h' }
+    );
 };
 
 // Función para verificar el JWT
 export const verifyToken = (token) => {
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verifica el token con la clave secreta
-        return decoded; // Si todo está bien, devolvemos los datos del usuario
+        return jwt.verify(token, process.env.JWT_SECRET); // Usa la misma clave
     } catch (error) {
-        console.error('Error al verificar el token:', error);
-        return null; // Retorna null si el token no es válido
+        console.error("Error verificando token:", error);
+        return null;
     }
 };
+
+console.log("JWT_SECRET usado para firmar:", process.env.JWT_SECRET);
 
 
 

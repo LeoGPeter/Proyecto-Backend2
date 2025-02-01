@@ -1,6 +1,6 @@
 import express from 'express';
 import passport from 'passport';
-import User from '../models/User.js';
+import User from '../dao/models/user.model.js';
 import jwt from 'jsonwebtoken';
 import { hashPassword, comparePassword, generateToken } from '../utils.js';
 
@@ -23,42 +23,6 @@ router.post('/', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-
-// Ruta para login
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).send('Email y contraseña son requeridos.');
-    }
-
-    try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(401).send('Usuario no encontrado.');
-        }
-
-        const isPasswordValid = await user.comparePassword(password); // Compara usando el método del modelo
-        if (!isPasswordValid) {
-            return res.status(401).send('Contraseña incorrecta.');
-        }
-
-        // Generar token JWT
-        const token = jwt.sign(  // Aquí es donde se usa jwt
-            { id: user._id, email: user.email, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: '1h' }
-        );
-
-        // Guardar el token en una cookie
-        res.cookie('currentUser', token, { httpOnly: true, signed: true, maxAge: 3600000 });
-
-        res.redirect('/users/current');
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
 
 // Obtener todos los usuarios
 router.get('/', async (req, res) => {

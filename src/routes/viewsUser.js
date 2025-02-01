@@ -1,29 +1,23 @@
 import express from 'express';
-import { checkAuth} from '../middlewares/auth.js';
+import UserDTO from '../dto/UserDTO.js';
+import { checkAuth} from '../middlewares/authMiddleware.js';
      
 const router = express.Router();
 
-// Vista de login (usuarios no autenticados)
 router.get('/login', (req, res) => {
     const token = req.signedCookies?.currentUser;
 
     if (token) {
-        return res.redirect('/users/current');
+        return res.redirect('/users/current'); // Si ya hay sesión, redirigir a /current
     }
 
-    res.render('login');
+    res.render('login'); // Renderizar la vista login
 });
 
-// Ruta protegida para ver los datos del usuario
+
 router.get('/current', checkAuth, (req, res) => {
-    const { first_name, last_name, email, age, role } = req.user;
-    res.render('current', {
-        first_name,
-        last_name,
-        email,
-        age,
-        role
-    });
+    const userDTO = new UserDTO(req.user); // Convertimos el usuario a DTO
+    res.json(userDTO); // Enviamos solo los datos necesarios
 });
 
 router.get('/logout', (req, res) => {
